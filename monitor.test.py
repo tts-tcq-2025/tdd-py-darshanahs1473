@@ -5,7 +5,11 @@ def Add(numbers: str) -> int:
     delimiter = ","
     if numbers.startswith("//"):
         end = numbers.find("\n")
-        delimiter = numbers[2:end]
+        delim = numbers[2:end]
+        if delim.startswith("[") and delim.endswith("]"):
+            delimiter = delim[1:-1]
+        else:
+            delimiter = delim
         numbers = numbers[end + 1:]
 
     numbers = numbers.replace("\n", delimiter)
