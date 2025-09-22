@@ -1,12 +1,5 @@
-
 import pytest
-from string_calculator import StringCalculator
-
-
-@pytest.fixture
-def calc():
-    return StringCalculator()
-
+from calculator import Add
 
 @pytest.mark.parametrize(
     "expr, expected",
@@ -17,17 +10,16 @@ def calc():
         ("1,2,3,4", 10),
         ("1\n2,3", 6),
         ("//;\n1;2", 3),
-        ("2,1001", 2),
         ("//[***]\n1***2***3", 6),
-    ],
+        ("2,1001", 2),
+    ]
 )
-def test_expressions(calc, expr, expected):
-    assert calc.add(expr) == expected
+def test_valid_expressions(expr, expected):
+    assert Add(expr) == expected
 
-
-def test_negatives(calc):
+def test_negatives_raise():
     with pytest.raises(ValueError) as e:
-        calc.add("1,-2,-3")
+        Add("1,-2,-3")
     msg = str(e.value)
     assert "negatives not allowed" in msg
     assert "-2" in msg
