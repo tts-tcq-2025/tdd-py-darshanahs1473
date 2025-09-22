@@ -1,25 +1,27 @@
-def Add(numbers: str) -> int:
-    if not numbers:
-        return 0
-
-    delimiter = ","
+def parse_delimiter(numbers: str):
     if numbers.startswith("//"):
         end = numbers.find("\n")
         delim = numbers[2:end]
+        rest = numbers[end+1:]
         if delim.startswith("[") and delim.endswith("]"):
-            delimiter = delim[1:-1]
-        else:
-            delimiter = delim
-        numbers = numbers[end + 1:]
+            delim = delim[1:-1]
+        return delim, rest
+    return ",", numbers
 
+def parse_numbers(numbers: str, delimiter: str):
     numbers = numbers.replace("\n", delimiter)
-    list_num = [int(n) for n in numbers.split(delimiter) if n]
-
-    negatives = [n for n in list_num if n < 0]
+    nums = [int(n) for n in numbers.split(delimiter) if n]
+    negatives = [n for n in nums if n < 0]
     if negatives:
-        raise ValueError(f"negatives not allowed: {', '.join(map(str, negatives))}")
+        raise ValueError("negatives not allowed: " + ", ".join(map(str, negatives)))
+    return [n for n in nums if n <= 1000]
 
-    return sum(n for n in list_num if n <= 1000)
+def Add(numbers: str) -> int:
+    if not numbers:
+        return 0
+    delim, rest = parse_delimiter(numbers)
+    nums = parse_numbers(rest, delim)
+    return sum(nums)
 
 
 # --- Tests ---
