@@ -1,52 +1,35 @@
-import unittest
+import pytest
 from string_calculator import StringCalculator
 
 
-class TestStringCalculator(unittest.TestCase):
-def setUp(self):
-self.calc = StringCalculator()
+@pytest.fixture
+def calc():
+return StringCalculator()
 
 
-def test_empty_string_returns_zero(self):
-self.assertEqual(self.calc.add(""), 0)
+@pytest.mark.parametrize("input_str, expected", [
+("", 0),
+("1", 1),
+("1,2", 3),
+("1,2,3,4", 10),
+("1\n2,3", 6),
+("//;\n1;2", 3),
+("2,1001", 2),
+("//[***]\n1***2***3", 6),
+])
+def test_valid_cases(calc, input_str, expected):
+assert calc.add(input_str) == expected
 
 
-def test_single_number_returns_value(self):
-self.assertEqual(self.calc.add("1"), 1)
 
 
-def test_two_numbers_comma(self):
-self.assertEqual(self.calc.add("1,2"), 3)
-
-
-def test_unknown_amount_of_numbers(self):
-self.assertEqual(self.calc.add("1,2,3,4"), 10)
-
-
-def test_newline_and_comma(self):
-self.assertEqual(self.calc.add("1\n2,3"), 6)
-
-
-def test_custom_single_char_delimiter(self):
-self.assertEqual(self.calc.add("//;\n1;2"), 3)
-
-
-def test_ignore_large_numbers(self):
-self.assertEqual(self.calc.add("2,1001"), 2)
-
-
-def test_negatives_raise(self):
-with self.assertRaises(ValueError) as cm:
-self.calc.add("1,-2,-3,4")
-msg = str(cm.exception)
-self.assertIn("negatives not allowed", msg)
-self.assertIn("-2", msg)
-self.assertIn("-3", msg)
-
-
-def test_multi_char_delimiter(self):
-self.assertEqual(self.calc.add("//[***]\n1***2***3"), 6)
-
+def test_negatives_raise(calc):
+with pytest.raises(ValueError) as excinfo:
+calc.add("1,-2,-3,4")
+msg = str(excinfo.value)
+assert "negatives not allowed" in msg
+assert "-2" in msg
+assert "-3" in msg
 
 if __name__ == "__main__":
 unittest.main()
